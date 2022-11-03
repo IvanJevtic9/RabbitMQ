@@ -19,7 +19,9 @@ namespace RabbitMQ
         public static void Main(string[] args)
         {
             //BasicExample.MainFunc();
-            MultipleWorkersExample.MainFunc();
+            //MultipleWorkersExample.MainFunc();
+            MultipleConsumerQueueExample.MainFunc();
+
         }
     }
 }

@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace RabbitMQ.Examples
 {
-
     public class BasicExample
     {
         private static Publisher _publisher;
@@ -41,7 +40,7 @@ namespace RabbitMQ.Examples
             var exchangeType = ExchangeType.Topic;
 
             _publisher = new Publisher(connectionProvider, exchangeName, exchangeType);
-            _consumer = new Consumer(connectionProvider, BasicQueueName, exchangeName, exchangeType);
+            _consumer = new Consumer(connectionProvider, BasicQueueName, BasicQueueName, exchangeName, exchangeType);
         }
 
         private static async Task ProduceMessages(CancellationToken token)

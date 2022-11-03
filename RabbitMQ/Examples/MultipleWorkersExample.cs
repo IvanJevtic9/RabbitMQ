@@ -46,8 +46,8 @@ namespace RabbitMQ.Examples
             arguments1.Add("x-priority", 5);
 
             _publisher = new Publisher(connectionProvider, exchangeName, exchangeType);
-            _worker1 = new Consumer(connectionProvider, BasicQueueName, exchangeName, exchangeType, arguments1);
-            _worker2 = new Consumer(connectionProvider, BasicQueueName, exchangeName, exchangeType, arguments);
+            _worker1 = new Consumer(connectionProvider, BasicQueueName, BasicQueueName, exchangeName, exchangeType, arguments1);
+            _worker2 = new Consumer(connectionProvider, BasicQueueName, BasicQueueName, exchangeName, exchangeType, arguments);
         }
 
         private static async Task ProduceMessages(CancellationToken token)

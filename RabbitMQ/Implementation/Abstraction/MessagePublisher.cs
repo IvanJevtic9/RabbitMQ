@@ -20,7 +20,7 @@ namespace RabbitMQ.Implementation
             _channel.ExchangeDeclare(exchangeName, exchangeType, durable: true, autoDelete: false, arguments);
         }
 
-        public virtual async Task PublishAsync(string message, IDictionary<string, object> context, string queueName)
+        public virtual async Task PublishAsync(string message, IDictionary<string, object> context, string routingKey)
         {
             var body = Encoding.UTF8.GetBytes(message);
 
@@ -28,9 +28,10 @@ namespace RabbitMQ.Implementation
             properties.Persistent = true;
             properties.Headers = context;
 
-            _channel.BasicPublish(_exchangeName, queueName, properties, body);
+            _channel.BasicPublish(_exchangeName, routingKey, properties, body);
 
-            Console.WriteLine($"Exchange: {_exchangeName} sent message. Routing key: {queueName}. Message: {message}");
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"Exchange: {_exchangeName} sent message. Routing key: {routingKey}. Message: {message}", Console.ForegroundColor);
         }
 
         public virtual void Dispose()

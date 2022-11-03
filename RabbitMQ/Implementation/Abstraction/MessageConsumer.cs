@@ -12,17 +12,19 @@ namespace RabbitMQ.Implementation
         private readonly IModel _channel;
         private readonly string _exchangeName;
         private readonly string _queueName;
+        private readonly string _routingKey;
 
         protected bool _disposed;
 
-        public MessageConsumer(IConnectionProvider connectionProvider, string queueName, string exchangeName, string exchangeType, IDictionary<string, object> arguments = null)
+        public MessageConsumer(IConnectionProvider connectionProvider, string queueName, string routingKey, string exchangeName, string exchangeType, IDictionary<string, object> arguments = null)
         {
             _queueName = queueName;
             _exchangeName = exchangeName;
+            _routingKey = routingKey;
             _channel = connectionProvider.GetConnection().CreateModel();
             _channel.ExchangeDeclare(exchangeName, exchangeType, durable: true, autoDelete: false, arguments);
             _channel.QueueDeclare(queueName, durable: true, exclusive: false, autoDelete: false, null);
-            _channel.QueueBind(queueName, exchangeName, queueName);
+            _channel.QueueBind(queueName, exchangeName, routingKey);
         }
 
         public virtual async Task SubscribeAsync(Func<string, IDictionary<string, object>, Task<bool>> callback)
@@ -38,7 +40,9 @@ namespace RabbitMQ.Implementation
 
                 if (success)
                 {
-                    Console.WriteLine($"Exchange: {_exchangeName} received message. Routing key: {_queueName}. Message: {message}");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine($"Exchange: {_exchangeName} received message. Queue name: {_queueName}. Routing key: {_routingKey}. Message: {message}", 
+                        Console.ForegroundColor);
                     _channel.BasicAck(args.DeliveryTag, false);
                 }
             };
