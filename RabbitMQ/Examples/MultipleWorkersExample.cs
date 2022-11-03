@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace RabbitMQ.Examples
 {
-
-    public class BasicExample
+    public class MultipleWorkersExample
     {
         private static Publisher _publisher;
-        private static Consumer _consumer;
+        private static Consumer _worker1;
+        private static Consumer _worker2;
 
         private const string BasicQueueName = "basicQueue";
 
@@ -21,13 +21,12 @@ namespace RabbitMQ.Examples
 
             InitRabbitMQ();
 
+            Task.Run(() => SubscrubeAllWorker());
             Task.Run(() => ProduceMessages(tokenSource.Token));
-            Task.Run(() => ConsumeMessages(tokenSource.Token));
 
-            Task.Delay(100000).GetAwaiter().GetResult();
+            Task.Delay(10000).GetAwaiter().GetResult();
 
             tokenSource.Cancel();
-
             Console.WriteLine("Cancelation token activated");
 
             Thread.Sleep(2000);
@@ -38,10 +37,17 @@ namespace RabbitMQ.Examples
             var connectionProvider = new ConnectionProvider("amqp://guest:guest@localhost:5672");
 
             var exchangeName = "basic";
-            var exchangeType = ExchangeType.Topic;
+            var exchangeType = ExchangeType.Direct;
+
+            var arguments = new Dictionary<string, object>();
+            arguments.Add("x-priority", 10);
+
+            var arguments1 = new Dictionary<string, object>();
+            arguments1.Add("x-priority", 5);
 
             _publisher = new Publisher(connectionProvider, exchangeName, exchangeType);
-            _consumer = new Consumer(connectionProvider, BasicQueueName, exchangeName, exchangeType);
+            _worker1 = new Consumer(connectionProvider, BasicQueueName, exchangeName, exchangeType, arguments1);
+            _worker2 = new Consumer(connectionProvider, BasicQueueName, exchangeName, exchangeType, arguments);
         }
 
         private static async Task ProduceMessages(CancellationToken token)
@@ -59,8 +65,6 @@ namespace RabbitMQ.Examples
                 var message = $"MESSAGE-{i}";
 
                 var context = new Dictionary<string, object>();
-                context.Add("param1", "Value1");
-                context.Add("param2", 1000);
 
                 await _publisher.PublishAsync(message, context, BasicQueueName);
 
@@ -69,12 +73,18 @@ namespace RabbitMQ.Examples
             }
         }
 
-        private static async Task ConsumeMessages(CancellationToken cancellationToken)
+        private static async Task SubscrubeAllWorker()
         {
-            await _consumer.SubscribeAsync(async (message, header) =>
+            await _worker1.SubscribeAsync(async (message, header) =>
             {
-                Console.WriteLine(header["param1"].ToString());
-                Console.WriteLine(header["param2"]);
+                Console.WriteLine($"Worker1 received message: {message}");
+
+                return true;
+            });
+
+            await _worker2.SubscribeAsync(async (message, header) =>
+            {
+                Console.WriteLine($"Worker2 received message: {message}");
 
                 return true;
             });
