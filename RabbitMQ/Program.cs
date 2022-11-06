@@ -20,8 +20,8 @@ namespace RabbitMQ
         {
             //BasicExample.MainFunc();
             //MultipleWorkersExample.MainFunc();
-            MultipleConsumerQueueExample.MainFunc();
-
+            //MultipleConsumerQueueExample.MainFunc();
+            RoutingExample.MainFunc();
         }
     }
 }

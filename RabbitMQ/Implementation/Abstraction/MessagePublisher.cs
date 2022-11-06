@@ -8,8 +8,8 @@ namespace RabbitMQ.Implementation
 {
     public abstract class MessagePublisher : IMessagePublisher
     {
-        private readonly IModel _channel;
-        private readonly string _exchangeName;
+        protected readonly IModel _channel;
+        protected readonly string _exchangeName;
 
         protected bool _disposed;
 

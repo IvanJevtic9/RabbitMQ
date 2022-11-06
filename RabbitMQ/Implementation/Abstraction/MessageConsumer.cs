@@ -9,10 +9,10 @@ namespace RabbitMQ.Implementation
 {
     public abstract class MessageConsumer : IMessageConsumer
     {
-        private readonly IModel _channel;
-        private readonly string _exchangeName;
-        private readonly string _queueName;
-        private readonly string _routingKey;
+        protected readonly IModel _channel;
+        protected readonly string _exchangeName;
+        protected readonly string _queueName;
+        protected readonly string _routingKey;
 
         protected bool _disposed;
 
